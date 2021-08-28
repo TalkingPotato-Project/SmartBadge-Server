@@ -1,0 +1,26 @@
+#!/bin/zsh
+
+NAME="server"
+DJANGODIR=/home/sbserver01/serverdir
+USER=sbserver01
+GROUP=nginx
+WORKERS=3
+BIND=unix:/home/sbserver01/serverdir/run/gunicorn.sock
+DJANGO_SETTINGS_MODULE=server.settings
+DJANGO_WSGI_MODULE=server.wsgi
+LOGLEVEL=errorserver
+
+cd $DJANGODIR
+source myprojectenv/bin/activate
+
+export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+export PYTHONPATH=$DJANGODIR:$PYTHONPATH
+
+exec myprojectenv/bin/gunicorn server.wsgi:application \
+  --name $NAME \
+  --workers $WORKERS \
+  --user=$USER \
+  --group=$GROUP \
+  --bind=$BIND \
+  --log-level=$LOGLEVEL \
+  --log-file=-
